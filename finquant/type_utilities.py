@@ -63,14 +63,29 @@ def _check_type(
         validation_failed = True
 
     if element_type is not None:
-        if isinstance(arg_values, pd.DataFrame) and not all(
-            arg_values.dtypes == element_type
-        ):
-            validation_failed = True
+        if isinstance(arg_values, pd.DataFrame):
+            # Use np.issubdtype for numpy type checking (e.g., np.floating)
+            # Direct comparison like `dtype == np.floating` fails for float64
+            if isinstance(element_type, type) and issubclass(
+                element_type, np.generic
+            ):
+                if not all(
+                    np.issubdtype(dt, element_type) for dt in arg_values.dtypes
+                ):
+                    validation_failed = True
+            elif not all(arg_values.dtypes == element_type):
+                validation_failed = True
 
         if isinstance(arg_values, np.ndarray):
-            if arg_values.ndim == 2 and not arg_values.dtype == element_type:
-                validation_failed = True
+            if arg_values.ndim == 2:
+                # Use np.issubdtype for numpy type checking
+                if isinstance(element_type, type) and issubclass(
+                    element_type, np.generic
+                ):
+                    if not np.issubdtype(arg_values.dtype, element_type):
+                        validation_failed = True
+                elif not arg_values.dtype == element_type:
+                    validation_failed = True
             elif arg_values.ndim == 1 and not all(
                 isinstance(val, element_type) for val in arg_values
             ):
