@@ -59,11 +59,16 @@ dev = [
     "black",
     "isort",
     "jupyter",
-    "mypy",
     "pydantic",
     "pylint",
     "pytest>=7.3.2",
     "ruff",
+]
+
+docs = [
+    "sphinx>=6.2.1",
+    "sphinx-rtd-theme>=1.2.0",
+    "sphinx-autodoc-typehints",
 ]
 
 [build-system]
