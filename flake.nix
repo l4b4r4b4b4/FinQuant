@@ -1,5 +1,5 @@
 {
-  description = "FinQuant - A program for financial portfolio management, analysis and optimization";
+  description = "portfolio-mcp - Portfolio analysis MCP server powered by mcp-refcache";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
@@ -19,7 +19,7 @@
         };
 
         fhsEnv = pkgs.buildFHSEnv {
-          name = "finquant-dev-env";
+          name = "portfolio-mcp-dev-env";
 
           targetPkgs = pkgs':
             with pkgs'; [
@@ -50,20 +50,20 @@
             ];
 
           profile = ''
-            echo "📈 FinQuant Development Environment"
-            echo "===================================="
+            echo "📊 portfolio-mcp Development Environment"
+            echo "========================================="
 
             # Create and activate uv virtual environment if it doesn't exist
             if [ ! -d ".venv" ]; then
               echo "📦 Creating uv virtual environment..."
-              uv venv --python python3.12 --prompt "finquant"
+              uv venv --python python3.12 --prompt "portfolio-mcp"
             fi
 
             # Activate the virtual environment
             source .venv/bin/activate
 
             # Set a recognizable name for IDEs
-            export VIRTUAL_ENV_PROMPT="finquant"
+            export VIRTUAL_ENV_PROMPT="portfolio-mcp"
 
             # Sync dependencies
             if [ -f "pyproject.toml" ]; then
@@ -77,6 +77,7 @@
             echo "✅ Python: $(python --version)"
             echo "✅ uv:     $(uv --version)"
             echo "✅ Virtual environment: activated (.venv)"
+            echo "✅ PYTHONPATH: $PWD/app:$PWD"
           '';
 
           runScript = ''
@@ -84,11 +85,11 @@
             SHELL=${pkgs.zsh}/bin/zsh
 
             # Set PYTHONPATH to project root for module imports
-            export PYTHONPATH="$PWD"
+            export PYTHONPATH="$PWD/app:$PWD"
             export SSL_CERT_FILE="/etc/ssl/certs/ca-bundle.crt"
 
             echo ""
-            echo "📈 FinQuant Quick Reference:"
+            echo "📊 portfolio-mcp Quick Reference:"
             echo ""
             echo "🔧 Development:"
             echo "  uv sync                    - Sync dependencies"
@@ -102,15 +103,15 @@
             echo "  uv add --dev <package>     - Add dev dependency"
             echo "  uv remove <package>        - Remove dependency"
             echo ""
-            echo "🚀 Build & Publish:"
-            echo "  uv build                   - Build package"
-            echo "  uv publish                 - Publish to PyPI"
+            echo "🚀 Run Server:"
+            echo "  uv run portfolio-mcp           - Run MCP server (stdio)"
+            echo "  uv run portfolio-mcp --transport sse --port 8000"
             echo ""
             echo "📊 Features:"
-            echo "  - Portfolio analysis and optimization"
-            echo "  - Efficient Frontier computation"
-            echo "  - Monte Carlo simulation"
-            echo "  - Stock data from Yahoo Finance"
+            echo "  - Portfolio creation (Yahoo Finance, CoinGecko, Synthetic)"
+            echo "  - Analysis (returns, volatility, Sharpe, Sortino, VaR)"
+            echo "  - Optimization (Efficient Frontier, Monte Carlo)"
+            echo "  - Reference-based caching via mcp-refcache"
             echo ""
             echo "🚀 Ready to build!"
             echo ""
@@ -122,7 +123,7 @@
       in {
         devShells.default = pkgs.mkShell {
           shellHook = ''
-            exec ${fhsEnv}/bin/finquant-dev-env
+            exec ${fhsEnv}/bin/portfolio-mcp-dev-env
           '';
         };
 
