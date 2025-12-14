@@ -1,0 +1,10 @@
+include version
+include README.md
+include LICENSE.txt
+include requirements.txt
+include requirements_*.txt
+include setup.py
+include setup.cfg
+include pyproject.toml
+recursive-include finquant *.py
+recursive-include tests *.py
